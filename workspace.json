@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "game": "packages/game",
+    "game-e2e": "packages/game-e2e",
+    "util": "packages/util"
+  }
+}
