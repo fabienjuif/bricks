@@ -1,23 +1,17 @@
 import { createUseStyles } from 'react-jss';
 import { CellProps } from './cell.component';
+import { getItemStyles } from './util';
 
-type RuleNames = 'cell' | 'item';
+type RuleNames = 'cell';
 
 export const useStyles = createUseStyles<RuleNames, CellProps>({
-  cell: {
+  cell: (props) => ({
     height: '3em',
     width: '3em',
     border: '1px solid gray',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  item: {
-    '&.red': {
-      backgroundColor: 'red',
-    },
-    '&.blue': {
-      backgroundColor: 'blue',
-    },
-  },
+    ...getItemStyles(props.item),
+  }),
 });

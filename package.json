@@ -16,6 +16,7 @@
     "react-router-dom": "6.3.0",
     "react-spring": "^9.4.5",
     "regenerator-runtime": "0.13.7",
+    "seedrandom": "^3.0.5",
     "tslib": "^2.3.0",
     "zustand": "^4.0.0-rc.1"
   },
@@ -35,6 +36,7 @@
     "@types/react": "18.0.8",
     "@types/react-dom": "18.0.3",
     "@types/react-router-dom": "5.3.3",
+    "@types/seedrandom": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "~5.18.0",
     "@typescript-eslint/parser": "~5.18.0",
     "babel-jest": "27.5.1",

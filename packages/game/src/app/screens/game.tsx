@@ -10,7 +10,7 @@ export function Game() {
   const gridsCount = useStore((state) => state.grids.length);
 
   useEffect(() => {
-    init({ width: 4, height: 4, gridsCount: 3 });
+    init({ width: 4, height: 4, gridsCount: 3, seed: 'ToTo' });
   }, [init]);
 
   return (

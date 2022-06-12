@@ -1,13 +1,14 @@
-import { nanoid } from 'nanoid';
+import { nanoid, customAlphabet } from 'nanoid';
+import seedRandom from 'seedrandom';
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { WritableDraft } from 'immer/dist/types/types-external';
 import { wait } from '@bricks/util';
-import { Coord, GameState, Grid } from './types';
+import { Coord, GameStore, Grid, ItemType } from './types';
 import { cellEqual } from './helpers';
 
-const getGrid = (state: WritableDraft<GameState>, grid: Pick<Grid, 'id'>) => {
+const getGrid = (state: WritableDraft<GameStore>, grid: Pick<Grid, 'id'>) => {
   const innerGrid = state.grids.find(({ id }) => id === grid.id);
   if (!innerGrid) throw new Error(`Grid not found: ${grid.id}`);
   return innerGrid;
@@ -23,7 +24,12 @@ const getCell = (cell: Coord, grid: Grid) => {
   return localCell;
 };
 
-export const useStore = create<GameState>()(
+const getSeed = customAlphabet(
+  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890',
+  5,
+);
+
+export const useStore = create<GameStore>()(
   devtools(
     immer((set, get) => ({
       debug: {
@@ -31,12 +37,16 @@ export const useStore = create<GameState>()(
       },
       nextItem: undefined,
       grids: [],
-      init: ({ width, height, gridsCount }) => {
+      seed: undefined,
+      randomEngineState: undefined,
+      init: ({ width, height, gridsCount, seed = getSeed() }) => {
         if (get().grids.length > 0) return;
 
         set((state) => {
-          state.nextItem = { code: 'blue', id: nanoid() };
-
+          state.seed = seed;
+        });
+        get().revealNextItem();
+        set((state) => {
           const oneGrid: Omit<Grid, 'id'> = {
             width,
             height,
@@ -67,17 +77,40 @@ export const useStore = create<GameState>()(
           innerCell.item = {
             ...state.nextItem,
           };
-
-          state.nextItem = {
-            code: state.nextItem.code === 'blue' ? 'red' : 'blue',
-            id: nanoid(),
-          };
         });
+        get().revealNextItem();
         await wait(1000);
         set((state) => {
           const innerCell = getCell(cell, getGrid(state, grid));
           innerCell.isHighlighted = false;
         });
+      },
+      random: (min, max) => {
+        const next = seedRandom(get().seed, {
+          state: get().randomEngineState ?? true,
+        });
+
+        const n = min + Math.floor(next() * (max - min + 1));
+
+        set((state) => {
+          state.randomEngineState = next.state();
+        });
+
+        return n;
+      },
+      revealNextItem: () => {
+        const itemTypes = Object.keys(ItemType);
+        const code = get().random(0, itemTypes.length / 2 - 1);
+        const item = {
+          id: nanoid(),
+          code,
+        };
+
+        set((state) => {
+          state.nextItem = item;
+        });
+
+        return item;
       },
     })),
   ),

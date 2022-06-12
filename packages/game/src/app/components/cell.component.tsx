@@ -1,16 +1,18 @@
 import cn from 'classnames';
-import { useEffect } from 'react';
 import { useSpring, animated, config } from 'react-spring';
 import { Cell as CellType, Item, useStore } from '../store';
 import { useStyles } from './cell.styles';
 
 export type CellProps = CellType & {
+  /** Used for style */
   item?: Item;
   putItem: () => void;
 };
 
-export function Cell({ x, y, isHighlighted, item, putItem }: CellProps) {
-  const classes = useStyles();
+export function Cell(props: CellProps) {
+  const { x, y, isHighlighted, putItem } = props;
+
+  const classes = useStyles(props);
 
   // FIXME: use context
   const debug = useStore((state) => state.debug);
@@ -30,7 +32,7 @@ export function Cell({ x, y, isHighlighted, item, putItem }: CellProps) {
           .to((z) => `rotateZ(${z.toFixed(0)}deg)`),
       }}
       onClick={putItem}
-      className={cn(classes.cell, item && classes.item, item?.code)}
+      className={cn(classes.cell)}
     >
       {debug.enable && `${x}:${y}`}
     </animated.div>
